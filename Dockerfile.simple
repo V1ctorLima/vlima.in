@@ -1,0 +1,53 @@
+FROM node:18-alpine
+
+# Install nginx and other dependencies
+RUN apk add --no-cache nginx bash openssl
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy all files except MDX files
+COPY .babelrc .eslintrc .gitignore .prettierrc .prettierignore gatsby-*.js *.json ./
+COPY src/ ./src/
+COPY static/ ./static/
+COPY nginx/ ./nginx/
+
+# Create content directory structure
+RUN mkdir -p content/blog/hello-world content/blog/my-second-post content/blog/new-beginnings content/blog/test-post
+
+# Create minimal MDX files
+RUN echo '---\ntitle: Hello World\ndate: "2023-05-01T22:12:03.284Z"\ndescription: "Hello World"\nslug: hello-world\n---\n\n# Hello World\n\nThis is a placeholder post.' > content/blog/hello-world/index.mdx && \
+    echo '---\ntitle: My Second Post\ndate: "2023-05-06T23:46:37.121Z"\ndescription: "My Second Post"\nslug: my-second-post\n---\n\n# My Second Post\n\nThis is a placeholder post.' > content/blog/my-second-post/index.mdx && \
+    echo '---\ntitle: New Beginnings\ndate: "2023-05-28T22:40:32.169Z"\ndescription: "New Beginnings"\nslug: new-beginnings\n---\n\n# New Beginnings\n\nThis is a placeholder post.' > content/blog/new-beginnings/index.mdx && \
+    echo '---\ntitle: Test Post\ndate: "2023-06-01T12:00:00.000Z"\ndescription: "Test Post"\nslug: test-post\n---\n\n# Test Post\n\nThis is a placeholder post.' > content/blog/test-post/index.mdx
+
+# Build the Gatsby site
+RUN npm run build
+
+# Set up nginx
+RUN mkdir -p /run/nginx
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+RUN mkdir -p /etc/nginx/ssl /etc/nginx/conf.d
+COPY nginx/conf.d/ /etc/nginx/conf.d/
+
+# Copy the built site to nginx's html directory
+RUN cp -r public/* /usr/share/nginx/html/
+
+# Copy the entrypoint script
+COPY nginx/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Expose ports
+EXPOSE 80 443
+
+# Set the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"] 
