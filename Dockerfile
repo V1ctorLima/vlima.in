@@ -22,8 +22,8 @@ FROM nginx:alpine
 # Install dependencies
 RUN apk add --no-cache bash openssl
 
-# Copy the built Gatsby site
-COPY public /usr/share/nginx/html
+# Copy the built Gatsby site from the builder stage
+COPY --from=builder /app/public /usr/share/nginx/html
 
 # Create directories for SSL certificates
 RUN mkdir -p /etc/nginx/ssl
