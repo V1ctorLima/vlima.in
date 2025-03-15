@@ -1,0 +1,68 @@
+# Gatsby build output
+public/
+.cache/
+.gatsby-cache/
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Environment variables and secrets
+.env*
+.env.development
+.env.production
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+*.sublime*
+.history/
+
+# Log files
+logs/
+*.log
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Coverage reports
+coverage/
+
+# Temporary files
+tmp/
+temp/
+
+# Gatsby specific
+.gatsby-context.js
+gatsby-*.js.map
+
+# Deployment specific
+deploy-secrets.sh
+.netlify/
+.vercel/
+.now/
+
+# Personal notes and TODOs
+TODO.md
+NOTES.md
+
+# Sensitive information
+**/credentials.*
+**/secrets.*
+**/*config.private.*
+**/*private-key*
+**/*.pem
+**/*.key 

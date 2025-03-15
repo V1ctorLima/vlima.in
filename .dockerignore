@@ -1,0 +1,29 @@
+# Node modules
+node_modules
+
+# Gatsby cache and public directory
+.cache
+public
+
+# Git files
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment variables
+.env
+.env.*
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db 

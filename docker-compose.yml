@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  gatsby:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - SERVER_NAME=${SERVER_NAME:-vlima.in}
+    volumes:
+      - ./public:/usr/share/nginx/html
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - gatsby-network
+
+networks:
+  gatsby-network:
+    driver: bridge 
