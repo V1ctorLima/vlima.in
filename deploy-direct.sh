@@ -20,7 +20,20 @@ fi
 # Create a temporary directory for the build
 echo "Creating temporary build directory..."
 mkdir -p .build-tmp
-cp -r src nginx static package*.json gatsby-*.js .build-tmp/
+
+# Copy files if they exist
+echo "Copying project files..."
+[ -d "src" ] && cp -r src .build-tmp/ || echo "No src directory found, skipping..."
+[ -d "nginx" ] && cp -r nginx .build-tmp/ || echo "No nginx directory found, skipping..."
+[ -d "static" ] && cp -r static .build-tmp/ || echo "No static directory found, skipping..."
+[ -d "public" ] && cp -r public .build-tmp/ || echo "No public directory found, skipping..."
+
+# Copy configuration files
+for file in package*.json gatsby-*.js; do
+  if [ -f "$file" ]; then
+    cp "$file" .build-tmp/
+  fi
+done
 
 # Create content directory structure in the temporary directory
 echo "Creating minimal content files..."
@@ -68,6 +81,7 @@ COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/conf.d/ /etc/nginx/conf.d/
 
 # Copy the built site to nginx's html directory
+RUN mkdir -p /usr/share/nginx/html
 RUN cp -r public/* /usr/share/nginx/html/
 
 # Copy the entrypoint script
