@@ -16,6 +16,10 @@ if [ "$1" == "--auto-update" ]; then
   git pull origin main
 fi
 
+# Run the fix-mdx script to fix any MDX issues
+echo "Fixing MDX files..."
+./fix-mdx.sh
+
 # Build the Docker image (which will build the Gatsby site inside the container)
 echo "Building Docker image..."
 docker-compose -f $DOCKER_COMPOSE_FILE build
