@@ -16,11 +16,7 @@ if [ "$1" == "--auto-update" ]; then
   git pull origin main
 fi
 
-# Build the Gatsby site
-echo "Building Gatsby site..."
-npm run build
-
-# Build the Docker image
+# Build the Docker image (which will build the Gatsby site inside the container)
 echo "Building Docker image..."
 docker-compose -f $DOCKER_COMPOSE_FILE build
 
