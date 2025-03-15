@@ -1,5 +1,8 @@
-# Build stage
-FROM node:18-alpine AS builder
+# Use a single-stage build for simplicity
+FROM nginx:alpine
+
+# Install dependencies
+RUN apk add --no-cache bash openssl nodejs npm
 
 # Set working directory
 WORKDIR /app
@@ -16,14 +19,8 @@ COPY . .
 # Build the Gatsby site
 RUN npm run build
 
-# Serve stage
-FROM nginx:alpine
-
-# Install dependencies
-RUN apk add --no-cache bash openssl
-
-# Copy the built Gatsby site from the builder stage
-COPY --from=builder /app/public /usr/share/nginx/html
+# Copy the built site to Nginx's html directory
+RUN cp -r public/* /usr/share/nginx/html/
 
 # Create directories for SSL certificates
 RUN mkdir -p /etc/nginx/ssl
