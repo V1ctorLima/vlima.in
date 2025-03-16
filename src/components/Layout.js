@@ -30,16 +30,16 @@ const Layout = ({ location, title, children }) => {
           <div className="header-right">
             <div className="header-row">
               <div className="social-icons">
-                <a href="https://github.com/V1ctorLima" className="social-icon">
+                <a href="https://github.com/V1ctorLima" className="social-icon" target="_blank" rel="noopener noreferrer">
                   <img src={githubIcon} alt="GitHub" />
                 </a>
-                <a href="https://www.linkedin.com/in/victorlimasec/" className="social-icon">
+                <a href="https://www.linkedin.com/in/victorlimasec/" className="social-icon" target="_blank" rel="noopener noreferrer">
                   <img src={linkedinIcon} alt="LinkedIn" />
                 </a>
-                <a href="javascript:location.href = 'mailto:' + ['me','vlima.in'].join('@')" className="social-icon">
+                <a href="javascript:location.href = 'mailto:' + ['me','vlima.in'].join('@')" className="social-icon" target="_blank" rel="noopener noreferrer">
                   <img src={emailIcon} alt="Email" />
                 </a>
-                <a href="#" className="social-icon">
+                <a href="#" className="social-icon" target="_blank" rel="noopener noreferrer">
                   <img src={rssIcon} alt="RSS" />
                 </a>
               </div>
