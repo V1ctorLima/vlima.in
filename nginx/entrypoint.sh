@@ -2,8 +2,7 @@
 set -e
 
 # Default server name if not provided
-# SERVER_NAME=${SERVER_NAME:-"vlima.in"}
-SERVER_NAME=${SERVER_NAME:-"localhost"}
+ SERVER_NAME=${SERVER_NAME:-"vlima.in"}
 echo "Configuring Nginx for server name: $SERVER_NAME"
 
 # Replace the SERVER_NAME placeholder in the Nginx configuration
