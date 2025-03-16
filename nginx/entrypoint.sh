@@ -12,11 +12,6 @@ sed -i "s/\${SERVER_NAME}/$SERVER_NAME/g" /etc/nginx/conf.d/default.conf
 if [ ! -f /etc/nginx/ssl/fullchain.pem ] || [ ! -f /etc/nginx/ssl/privkey.pem ]; then
     echo "SSL certificates not found. Generating self-signed certificates..."
     mkdir -p /etc/nginx/ssl
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-        -keyout /etc/nginx/ssl/privkey.pem \
-        -out /etc/nginx/ssl/fullchain.pem \
-        -subj "/CN=$SERVER_NAME" \
-        -addext "subjectAltName=DNS:$SERVER_NAME"
     echo "Self-signed certificates generated."
 else
     echo "Using existing SSL certificates."
