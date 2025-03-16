@@ -16,20 +16,9 @@ if [ "$1" == "--auto-update" ]; then
   git pull origin main
 fi
 
-# Make scripts executable
-chmod +x fix-mdx-drastic.sh restore-mdx.sh
-
-# Use the drastic approach to fix MDX files
-echo "Taking drastic measures to fix MDX files..."
-./fix-mdx-drastic.sh
-
 # Build the Docker image (which will build the Gatsby site inside the container)
 echo "Building Docker image..."
 docker-compose -f $DOCKER_COMPOSE_FILE build
-
-# Restore original MDX files
-echo "Restoring original MDX files..."
-./restore-mdx.sh
 
 # Stop and remove existing containers
 echo "Stopping existing containers..."
