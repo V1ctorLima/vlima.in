@@ -64,4 +64,4 @@ NOTES.md
 **/secrets.*
 **/*config.private.*
 **/*private-key*
-**/*.key 
+**/*.key

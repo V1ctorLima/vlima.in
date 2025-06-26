@@ -39,7 +39,7 @@ const Layout = ({ location, title, children }) => {
                 <a href="javascript:location.href = 'mailto:' + ['me','vlima.in'].join('@')" className="social-icon" target="_blank" rel="noopener noreferrer">
                   <img src={emailIcon} alt="Email" />
                 </a>
-                <a href="#" className="social-icon" target="_blank" rel="noopener noreferrer">
+                <a href="/rss.xml" className="social-icon" target="_blank" rel="noopener noreferrer">
                   <img src={rssIcon} alt="RSS" />
                 </a>
               </div>
