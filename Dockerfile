@@ -16,6 +16,11 @@ RUN npm install
 # Copy all files
 COPY . .
 
+# Accept build arguments for environment variables
+ARG GATSBY_GA_MEASUREMENT_ID
+# Make the build arg available as environment variable during build
+ENV GATSBY_GA_MEASUREMENT_ID=$GATSBY_GA_MEASUREMENT_ID
+
 # Build the Gatsby site
 RUN npm run build
 
