@@ -111,14 +111,15 @@ module.exports = {
       },
     },
     {
-      resolve: `gatsby-plugin-gtag`,
+      resolve: `gatsby-plugin-google-gtag`,
       options: {
-        // Your Google Analytics Measurement ID
-        trackingId: process.env.GATSBY_GA_MEASUREMENT_ID || '',
+        // You can add multiple tracking ids and a pageview event will be fired for all of them.
+        trackingIds: [
+          "G-H7MZ8PJ08S", // Google Analytics / GA
+        ],
         // This object gets passed directly to the gtag config command
         // This config will be shared across all trackingIds
         gtagConfig: {
-          // Respect user privacy settings
           anonymize_ip: true,
           cookie_expires: 0,
         },
@@ -130,10 +131,6 @@ module.exports = {
           respectDNT: true,
           // Avoids sending pageview hits from custom paths
           exclude: ["/preview/**", "/do-not-track/me/too/"],
-          // Defaults to https://www.googletagmanager.com
-          origin: "https://www.googletagmanager.com",
-          // Delays processing pageview events on route update (in milliseconds)
-          delayOnRouteUpdate: 0,
         },
       },
     },
