@@ -16,6 +16,12 @@ jobs:
         echo "Port: ${{ secrets.VPS_PORT }}"
         echo "Username: ${{ secrets.VPS_USERNAME }}"
         echo "Project Path: ${{ secrets.VPS_PROJECT_PATH }}"
+        echo ""
+        echo "Testing network connectivity..."
+        ping -c 3 ${{ secrets.VPS_HOST }} || echo "Ping failed"
+        echo ""
+        echo "Testing port connectivity..."
+        timeout 10 nc -zv ${{ secrets.VPS_HOST }} ${{ secrets.VPS_PORT }} || echo "Port test failed"
         
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v1.0.3
