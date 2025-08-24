@@ -64,4 +64,7 @@ NOTES.md
 **/secrets.*
 **/*config.private.*
 **/*private-key*
-**/*.key
+**/*.key# SSL Certificates - stored in GitHub Secrets
+nginx/ssl/*.pem
+nginx/ssl/*.key
+nginx/ssl/*.crt
