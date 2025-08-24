@@ -13,7 +13,7 @@ jobs:
       run: |
         echo "Attempting to connect to VPS..."
         echo "Host: ${{ secrets.VPS_HOST }}"
-        echo "Port: ${{ secrets.VPS_PORT || 22 }}"
+        echo "Port: ${{ secrets.VPS_PORT }}"
         echo "Username: ${{ secrets.VPS_USERNAME }}"
         echo "Project Path: ${{ secrets.VPS_PROJECT_PATH }}"
         
@@ -23,7 +23,7 @@ jobs:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
-        port: ${{ secrets.VPS_PORT || 22 }}
+        port: ${{ secrets.VPS_PORT }}
         timeout: 60s
         command_timeout: 15m
         script: |
