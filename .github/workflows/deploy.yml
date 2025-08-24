@@ -9,6 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Debug connection info
+      run: |
+        echo "Attempting to connect to VPS..."
+        echo "Host: ${{ secrets.VPS_HOST }}"
+        echo "Port: ${{ secrets.VPS_PORT || 22 }}"
+        echo "Username: ${{ secrets.VPS_USERNAME }}"
+        echo "Project Path: ${{ secrets.VPS_PROJECT_PATH }}"
+        
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -16,21 +24,32 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
         port: ${{ secrets.VPS_PORT || 22 }}
+        timeout: 60s
+        command_timeout: 15m
         script: |
+          echo "=== Connection successful! ==="
+          echo "Current directory: $(pwd)"
+          echo "Target directory: ${{ secrets.VPS_PROJECT_PATH }}"
+          
           cd ${{ secrets.VPS_PROJECT_PATH }}
+          echo "Changed to: $(pwd)"
           
           # Pull latest changes from GitHub
+          echo "=== Pulling latest changes ==="
           git pull origin main
           
           # Create .env file with environment variables
+          echo "=== Creating .env file ==="
           echo "GATSBY_GA_MEASUREMENT_ID=${{ secrets.GATSBY_GA_MEASUREMENT_ID }}" > .env
           echo "SERVER_NAME=${{ secrets.SERVER_NAME }}" >> .env
           
           # Run deployment script (which handles Docker build and deployment)
+          echo "=== Running deployment script ==="
           chmod +x deploy.sh
           ./deploy.sh
           
           # Clean up old Docker images to save space
+          echo "=== Cleaning up old Docker images ==="
           docker image prune -f
           
           # Show final status
