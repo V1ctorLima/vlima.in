@@ -48,7 +48,7 @@ const IndexPage = ({ data, location }) => {
             textAlign: "center",
             margin: "0 auto 2rem auto"
           }}>
-            Security engineer and technology enthusiast. I write about security,
+            Security engineer, geek and technology enthusiast. I write about security,
             detection engineering, software development, and share my experiences in the tech industry.
           </p>
           <div className="hero-buttons" style={{ textAlign: "center" }}>
