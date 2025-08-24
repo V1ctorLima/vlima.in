@@ -105,3 +105,4 @@ The deployment automatically generates self-signed SSL certificates. For product
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details. # Test automatic deployment
+# Testing VPS_USERNAME fix
