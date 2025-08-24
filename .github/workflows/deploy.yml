@@ -9,20 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Debug connection info
-      run: |
-        echo "Attempting to connect to VPS..."
-        echo "Host: ${{ secrets.VPS_HOST }}"
-        echo "Port: ${{ secrets.VPS_PORT }}"
-        echo "Username: ${{ secrets.VPS_USERNAME }}"
-        echo "Project Path: ${{ secrets.VPS_PROJECT_PATH }}"
-        echo ""
-        echo "Testing network connectivity..."
-        ping -c 3 ${{ secrets.VPS_HOST }} || echo "Ping failed"
-        echo ""
-        echo "Testing port connectivity..."
-        timeout 10 nc -zv ${{ secrets.VPS_HOST }} ${{ secrets.VPS_PORT }} || echo "Port test failed"
-        
+
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -33,45 +20,28 @@ jobs:
         timeout: 60s
         command_timeout: 15m
         script: |
-          echo "=== Connection successful! ==="
-          echo "Current directory: $(pwd)"
-          echo "Target directory: ${{ secrets.VPS_PROJECT_PATH }}"
-          
           cd ${{ secrets.VPS_PROJECT_PATH }}
-          echo "Changed to: $(pwd)"
           
-          # Pull latest changes from GitHub
-          echo "=== Pulling latest changes ==="
+          # Pull latest changes
           git pull origin main
           
-          # Create .env file with environment variables
-          echo "=== Creating .env file ==="
+          # Create environment file
           echo "GATSBY_GA_MEASUREMENT_ID=${{ secrets.GATSBY_GA_MEASUREMENT_ID }}" > .env
           echo "SERVER_NAME=${{ secrets.SERVER_NAME }}" >> .env
           
-          # Restore SSL certificates from GitHub Secrets
-          echo "=== Restoring SSL certificates ==="
+          # Restore SSL certificates
           mkdir -p nginx/ssl
           echo "${{ secrets.SSL_FULLCHAIN }}" > nginx/ssl/fullchain.pem
           echo "${{ secrets.SSL_PRIVKEY }}" > nginx/ssl/privkey.pem
           chmod 644 nginx/ssl/fullchain.pem
           chmod 600 nginx/ssl/privkey.pem
-          echo "SSL certificates restored successfully"
           
-          # Run deployment script (which handles Docker build and deployment)
-          echo "=== Running deployment script ==="
+          # Deploy
           chmod +x deploy.sh
           ./deploy.sh
           
-          # Clean up old Docker images to save space
-          echo "=== Cleaning up old Docker images ==="
+          # Cleanup
           docker image prune -f
-          
-          # Show final status
-          echo "=== Deployment Status ==="
-          docker-compose ps
-          echo "=== Container Logs (last 10 lines) ==="
-          docker-compose logs --tail=10
           
     - name: Notify deployment status
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
