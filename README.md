@@ -34,3 +34,4 @@ npm run build
 
 MIT License - see LICENSE file for details.# Testing secure deploy user
 # Force fresh deployment - no Docker cache
+<-keygen Deployment test Mon Aug 25 13:32:17 CEST 2025 -->
