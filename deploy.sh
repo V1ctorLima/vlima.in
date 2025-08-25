@@ -35,8 +35,8 @@ else
 fi
 
 # Build the Docker image (which will build the Gatsby site inside the container)
-log "Building Docker image..."
-docker-compose -f $DOCKER_COMPOSE_FILE build
+log "Building Docker image with no cache to ensure fresh build..."
+docker-compose -f $DOCKER_COMPOSE_FILE build --no-cache
 
 # Stop and remove existing containers
 log "Stopping existing containers..."
