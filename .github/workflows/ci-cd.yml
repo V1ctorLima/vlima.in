@@ -1,0 +1,86 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build application
+      run: npm run build
+      env:
+        GATSBY_GA_MEASUREMENT_ID: ${{ secrets.GATSBY_GA_MEASUREMENT_ID }}
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-files
+        path: public/
+        retention-days: 1
+
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        timeout: 60s
+        command_timeout: 15m
+        script: |
+          cd ${{ secrets.VPS_PROJECT_PATH }}
+          
+          # Update codebase
+          git pull origin main
+          
+          # Configure environment
+          echo "GATSBY_GA_MEASUREMENT_ID=${{ secrets.GATSBY_GA_MEASUREMENT_ID }}" > .env
+          echo "SERVER_NAME=${{ secrets.SERVER_NAME }}" >> .env
+          
+          # Setup certificates
+          mkdir -p nginx/ssl
+          echo "${{ secrets.SSL_FULLCHAIN }}" > nginx/ssl/fullchain.pem
+          echo "${{ secrets.SSL_PRIVKEY }}" > nginx/ssl/privkey.pem
+          chmod 644 nginx/ssl/fullchain.pem
+          chmod 600 nginx/ssl/privkey.pem
+          
+          # Execute deployment
+          chmod +x deploy.sh
+          ./deploy.sh
+          
+          # Maintenance
+          docker image prune -f
+          
+    - name: Deployment notification
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Production deployment completed successfully"
+        else
+          echo "❌ Production deployment failed"
+        fi
