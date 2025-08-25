@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build Application
+    name: build
     runs-on: ubuntu-latest
     
     steps:
@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: npm install
       
-    - name: Build application
+    - name: build
       run: npm run build
       env:
         GATSBY_GA_MEASUREMENT_ID: ${{ secrets.GATSBY_GA_MEASUREMENT_ID }}
@@ -36,13 +36,13 @@ jobs:
         retention-days: 1
 
   deploy:
-    name: Deploy to Production
+    name: deploy
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
-    - name: Deploy to server
+    - name: deploy
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.VPS_HOST }}
