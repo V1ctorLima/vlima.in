@@ -52,34 +52,85 @@ jobs:
         timeout: 60s
         command_timeout: 15m
         script: |
+          set -e
+
           cd ${{ secrets.VPS_PROJECT_PATH }}
-          
-          # Update codebase
-          git pull origin main
-          
+
+          # Update codebase - force sync to exact commit that triggered this deploy
+          git fetch origin main
+          git reset --hard origin/main
+
+          # Verify we have the expected commit
+          CURRENT_COMMIT=$(git rev-parse HEAD)
+          EXPECTED_COMMIT="${{ github.sha }}"
+          if [ "$CURRENT_COMMIT" != "$EXPECTED_COMMIT" ]; then
+            echo "ERROR: Expected commit $EXPECTED_COMMIT but VPS is at $CURRENT_COMMIT"
+            exit 1
+          fi
+          echo "Commit verified: $CURRENT_COMMIT"
+
           # Configure environment
           echo "GATSBY_GA_MEASUREMENT_ID=${{ secrets.GATSBY_GA_MEASUREMENT_ID }}" > .env
           echo "SERVER_NAME=${{ secrets.SERVER_NAME }}" >> .env
-          
+
           # Setup certificates
           mkdir -p nginx/ssl
           echo "${{ secrets.SSL_FULLCHAIN }}" > nginx/ssl/fullchain.pem
           echo "${{ secrets.SSL_PRIVKEY }}" > nginx/ssl/privkey.pem
           chmod 644 nginx/ssl/fullchain.pem
           chmod 600 nginx/ssl/privkey.pem
-          
+
           # Execute deployment
           chmod +x deploy.sh
           ./deploy.sh
-          
+
           # Maintenance
           docker image prune -f
-          
+
+    - name: Validate deployment
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        timeout: 30s
+        script: |
+          set -e
+
+          # Check container is running
+          CONTAINER_ID=$(docker ps -q --filter "name=vlimain_gatsby")
+          if [ -z "$CONTAINER_ID" ]; then
+            echo "ERROR: Container is not running after deploy"
+            exit 1
+          fi
+          echo "Container running: $CONTAINER_ID"
+
+          # Verify site is responding
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/)
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "ERROR: Homepage returned HTTP $HTTP_CODE (expected 200)"
+            exit 1
+          fi
+          echo "Homepage: HTTP $HTTP_CODE"
+
+          # Verify each page in src/pages/ has a corresponding built file
+          for page in $(docker exec $CONTAINER_ID ls /app/src/pages/ | grep '\.js$' | sed 's/\.js$//'); do
+            if [ "$page" = "index" ]; then
+              docker exec $CONTAINER_ID test -f /app/public/index.html || { echo "ERROR: missing /app/public/index.html"; exit 1; }
+            else
+              docker exec $CONTAINER_ID test -d /app/public/$page || { echo "ERROR: missing /app/public/$page"; exit 1; }
+            fi
+            echo "Built page verified: /$page"
+          done
+
+          echo "Deployment validation passed"
+
     - name: Deployment notification
       if: always()
       run: |
-        if [ ${{ job.status }} == 'success' ]; then
-          echo "✅ Production deployment completed successfully"
+        if [ "${{ job.status }}" = "success" ]; then
+          echo "Production deployment completed successfully"
         else
-          echo "❌ Production deployment failed"
+          echo "Production deployment failed"
         fi
